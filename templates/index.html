@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Box Template</title>
+</head>
+<body>
+    <div>
+        <label for="inputBox">Enter your text:</label>
+        <input type="text" id="inputBox" name="inputBox">
+        <button onclick="sendInputToFlask()">Submit</button>
+     
+    </div>
+
+    <!-- Container for displaying items -->
+    <div id="itemsContainer"></div>
+
+    <!-- Include Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script>
+        async function sendInputToFlask() {
+            try {
+                // Get the input value
+                var inputValue = document.getElementById("inputBox").value;
+
+                // Make a POST request to Flask backend
+                const response = await axios.post('http://localhost:5500/process_input', { input: inputValue });
+                console.log("Response from Flask:", response.data);
+                console.log("Response from Flask:", response.data.message);
+
+                // Display items on the screen
+                displayItems(response.data.message);
+            } catch (error) {
+                console.error("Error sending input to Flask:", error);
+            }
+        }
+
+        function displayItems(items) {
+            var itemsContainer = document.getElementById("itemsContainer");
+            // Clear previous items
+            itemsContainer.innerHTML = ''; 
+            // reccomendation length is set in python 
+            // if len is not 10 we have error
+            if (items.length == 10) {
+                //create list of movie recs to display 
+                var ul = document.createElement("ul");
+                items.forEach(function(item) {
+                    var li = document.createElement("li");
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+                itemsContainer.appendChild(ul);
+            } else {
+                // will respond with no movies found if bad input / does not work accordingly
+                itemsContainer.textContent = items;
+            }
+        }
+    </script>
+</body>
+</html>
